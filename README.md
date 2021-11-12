@@ -4,6 +4,6 @@
 
 For backend:
 
-- Use Husky? https://www.youtube.com/watch?v=tuzys2b1J70
-- How testing should be done
-- Swagger docs
+-   Use Husky?
+-   Use Jest and Supertest (for testing node.js HTTP servers)?
+-   Swagger docs
