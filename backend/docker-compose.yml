@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: tim
+      POSTGRES_DB: get2gether-api
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  api:
+    image:
+    depends_on:
+      - db
+    ports:
+      - '4000:4000'

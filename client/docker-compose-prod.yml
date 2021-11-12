@@ -1,0 +1,11 @@
+# See docker-compile file versions here: https://docs.docker.com/compose/compose-file/
+version: "3.8"
+services: # Containers
+  frontend: # Give it whatever name you want
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    environment:
+      - MY_ENV=Ass

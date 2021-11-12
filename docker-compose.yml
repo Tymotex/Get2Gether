@@ -1,4 +1,0 @@
-# See docker-compile file versions here: https://docs.docker.com/compose/compose-file/
-version: "3.8"
-services:
-    frontend:
