@@ -1,0 +1,18 @@
+FROM node:14.18.1
+WORKDIR /app
+
+# Copies package.json into the CURRENT WORKING DIRECTORY OF THE CONTAINER, so /app
+COPY package.json .
+
+RUN yarn install
+
+# Copies all source code in the project root dir over to the /app dir in the container
+# IMPORTANT NOTE: why did we copy over package.json first and then yarn installed? 
+# Remember that Docker caches intermediate build steps. Doing this is a great optimisation
+# because otherwise Docker would detect source code changes as enough reason to run yarn install
+# again. What it should be doing is running yarn install iff package.json changes
+COPY . .
+
+EXPOSE 3000
+
+CMD ["yarn", "start"]
