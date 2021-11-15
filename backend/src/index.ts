@@ -1,13 +1,16 @@
 import express, { Application, Request, Response } from 'express';
-
+import cors from 'cors';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const app: Application = express();
-const port = 3000;
+const port = 4000;
 
 // Prisma uses a 'lazy connection' which means that it doesn't establish a connection
 // to the database server until the first request to the db needs to be served
 const prisma = new PrismaClient();
+
+// Enabling all CORS requests
+app.use(cors());
 
 // Body parsing Middleware
 app.use(express.json());
@@ -17,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
   try {
     const allUsers = await prisma.user.findMany();
-    return res.status(200).send(`<pre>${JSON.stringify(allUsers, null, 4)}</pre>`);
+    return res.status(200).send(`${JSON.stringify(allUsers, null, 4)}`);
   } catch (e) {
     return res.status(500).send(`Failed. Reason: <pre>${e.message}</pre>`);
   }

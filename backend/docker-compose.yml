@@ -19,4 +19,4 @@ services:
     depends_on:
       - db # Start up the database server first. It's possible that the database server isn't up by the time the web server attempts to establish a connection, so you need to setup 'retry logic' in the Express server
     ports:
-      - '3000:3000'
+      - '4000:4000'
