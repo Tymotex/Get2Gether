@@ -1,0 +1,25 @@
+# ===== Building Production-Ready Files =====
+FROM node:14-alpine as clientBuild
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN yarn install
+
+COPY . .
+
+CMD ["yarn", "run", "dev"]
+
+# Note: below was an attempt to set up NGINX to serve `next build` files. Couldn't figure out how to set up hot reloading since bind mounting wouldn't work
+
+# # Outputs build files to the `.next` directory
+# RUN yarn run build
+
+# CMD ["yarn", "run", "start"]
+
+# # ===== NGINX =====
+
+# FROM nginx
+
+# COPY --from=clientBuild /app/.next /usr/share/nginx/html

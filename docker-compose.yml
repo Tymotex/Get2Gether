@@ -7,8 +7,9 @@ services:
             POSTGRES_USER: get2gether # Creates a user with superuser privileges
             POSTGRES_PASSWORD: get2gether # The created user's password
             POSTGRES_DB: get2gether # Name for the default database created when the container starts up
+        # Data persistence is done by bind mounting the host's directory `./backend/volumes/pgdata` to `/var/lib/postgressql/data`, which is the default path where the database is stored by PostgreSQL on Linux. If `backend/volumes/pgdata` doesn't exist, it'll be created
         volumes:
-            - ./backend/volumes/pgdata:/var/lib/postgresql/data # Bind mounts the host's directory `./backed/volumes/pgdata` to `/var/lib/postgressql/data`, which is the default path where the database is stored by PostgreSQL on Linux. If `pgdata` doesn't exist, it'll be created
+            - ./backend/volumes/pgdata:/var/lib/postgresql/data
         ports:
             - "5432:5432"
     # Container for the express API server
@@ -18,6 +19,8 @@ services:
             dockerfile: Dockerfile.dev
         depends_on:
             - db # Start up the database server first. It's possible that the database server isn't up by the time the web server attempts to establish a connection, so you need to setup 'retry logic' in the Express server
+        volumes:
+            - ./backend:/app
         ports:
             - "4000:4000"
     # Container for the Next.js frontend
@@ -28,5 +31,7 @@ services:
         depends_on:
             - db
             - api
+        volumes:
+            - ./frontend:/app
         ports:
             - "3000:3000"

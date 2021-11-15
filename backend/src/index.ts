@@ -64,4 +64,5 @@ app.get('/users', async (req: Request, res: Response): Promise<Response> => {
 // Starting the server
 app.listen(port, (): void => {
   console.log(`Connected successfully on port ${port}`);
+  console.log(`Database connection URI: ${process.env.DATABASE_URL}`);
 });

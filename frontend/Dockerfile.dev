@@ -1,4 +1,5 @@
-FROM node:14-alpine
+# ===== Building Production-Ready Files =====
+FROM node:14-alpine as clientBuild
 
 WORKDIR /app
 
@@ -10,4 +11,3 @@ COPY . .
 
 CMD ["yarn", "run", "dev"]
 
-# TODO: add a build stage and set up production grade server, eg. nginx 

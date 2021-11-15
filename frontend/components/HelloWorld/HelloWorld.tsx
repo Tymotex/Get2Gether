@@ -29,13 +29,14 @@ const HelloWorld: React.FC<Props> = () => {
 
     return (
         <div style={{ background: "lightgray" }}>
-            Hello World
+            Hello World!
             <div style={{ margin: 10, background: "yellow" }}>
                 Users in the database:
                 <hr />
                 {users && users.length > 0 ? (
-                    users.map((user) => (
+                    users.map((user, i) => (
                         <div
+                            key={i}
                             style={{
                                 margin: 10,
                                 padding: 10,
