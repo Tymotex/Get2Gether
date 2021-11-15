@@ -1,0 +1,13 @@
+FROM node:14-alpine
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN yarn install
+
+COPY . .
+
+CMD ["yarn", "run", "dev"]
+
+# TODO: add a build stage and set up production grade server, eg. nginx 
