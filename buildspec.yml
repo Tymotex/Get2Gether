@@ -15,8 +15,8 @@ phases:
             - echo ========== BUILD STAGE - Building the Docker image ==========
             - echo Build started on `date`
             - docker login -u get2gether --password get2gether # Insecure, but there's nothing of interest in this account other than being a workaround to Docker's rate limiting. See: https://jrklein.com/2020/11/04/aws-codebuild-failed-due-to-docker-pull-rate-limit-solution-update-buildspec-yml-file/
-            - docker build -f Dockerfile.prod -t $CLIENT_RESPOSITORY_URI:latest .
-            - docker build -f Dockerfile.prod -t $BACKEND_RESPOSITORY_URI:latest .
+            - docker build -t $CLIENT_RESPOSITORY_URI:latest .
+            - docker build -t $BACKEND_RESPOSITORY_URI:latest .
             - docker tag $CLIENT_RESPOSITORY_URI:latest $CLIENT_RESPOSITORY_URI:$IMAGE_TAG
             - docker tag $BACKEND_RESPOSITORY_URI:latest $BACKEND_RESPOSITORY_URI:$IMAGE_TAG
     post_build: # Push the Docker image we built to the ECR repo. Writes `imagedefinitions.json` which is used to create a new revision of the service's task definition
