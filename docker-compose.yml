@@ -1,4 +1,37 @@
-# See docker-compile file versions here: https://docs.docker.com/compose/compose-file/
 version: "3.8"
 services:
-    frontend:
+    # Container for the PostgreSQL database server
+    db: # This name becomes the 'network alias' which is treated as the hostname in the database connection URI that the express server uses to establish a connection
+        image: postgres
+        environment:
+            POSTGRES_USER: get2gether # Creates a user with superuser privileges
+            POSTGRES_PASSWORD: get2gether # The created user's password
+            POSTGRES_DB: get2gether # Name for the default database created when the container starts up
+        # Data persistence is done by bind mounting the host's directory `./backend/volumes/pgdata` to `/var/lib/postgressql/data`, which is the default path where the database is stored by PostgreSQL on Linux. If `backend/volumes/pgdata` doesn't exist, it'll be created
+        volumes:
+            - ./backend/volumes/pgdata:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+    # Container for the express API server
+    api:
+        build:
+            context: backend
+            dockerfile: Dockerfile.dev
+        depends_on:
+            - db # Start up the database server first. It's possible that the database server isn't up by the time the web server attempts to establish a connection, so you need to setup 'retry logic' in the Express server
+        volumes:
+            - ./backend:/app
+        ports:
+            - "4000:4000"
+    # Container for the Next.js frontend
+    client:
+        build:
+            context: frontend
+            dockerfile: Dockerfile.dev
+        depends_on:
+            - db
+            - api
+        volumes:
+            - ./frontend:/app
+        ports:
+            - "3000:3000"

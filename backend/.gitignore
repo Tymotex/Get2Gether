@@ -1,5 +1,5 @@
 coverage
 node_modules
-volumes
-pgdata
+.env
 build
+volumes

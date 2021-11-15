@@ -1,0 +1,47 @@
+// This file contains the schemas that bridges the objects that the express
+// server works with and the tables and records in the database server (PostgreSQL)
+// 
+// The syntax in this file is Prisma Schema Language (PSL), learn it here: 
+//     https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma pulls the database connection string from the .env file in ../
+  url      = env("DATABASE_URL") 
+}
+
+// ===== Prisma Schemas =====
+// Prisma Migrate is used to generate and execute the SQL for creating the 
+// tables corresponding to the data model definitions below in PostgreSQL. 
+// Note: everytime you make a change, you need to run `npx prisma generate`
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String?
+  posts   Post[]
+  profile Profile?
+}
