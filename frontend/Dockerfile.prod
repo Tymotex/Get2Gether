@@ -9,17 +9,13 @@ RUN yarn install
 
 COPY . .
 
-CMD ["yarn", "run", "dev"]
+RUN yarn build 
 
-# Note: below was an attempt to set up NGINX to serve `next build` files. Couldn't figure out how to set up hot reloading since bind mounting wouldn't work
+# # Outputs static build files to `./out`
+RUN yarn export
 
-# # Outputs build files to the `.next` directory
-# RUN yarn run build
+# ===== NGINX =====
 
-# CMD ["yarn", "run", "start"]
+FROM nginx
 
-# # ===== NGINX =====
-
-# FROM nginx
-
-# COPY --from=clientBuild /app/.next /usr/share/nginx/html
+COPY --from=clientBuild /app/out /usr/share/nginx/html

@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+    pre_build: # Log into ECR, point the repo URI to the Docker image on ECR that we want to deploy
+        commands:
+            - echo ========== PRE BUILD STAGE - Loggin into Amazon ECR ==========
+            - aws --version
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 895792020744.dkr.ecr.ap-southeast-2.amazonaws.com
+            - CLIENT_RESPOSITORY_URI=895792020744.dkr.ecr.ap-southeast-2.amazonaws.com/get2gether-web-client
+            - BACKEND_RESPOSITORY_URI=895792020744.dkr.ecr.ap-southeast-2.amazonaws.com/get2gether-backend
+            - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+            - IMAGE_TAG=${COMMIT_HASH:=latest}
+    build: # Build the Docker image
+        commands:
+            - echo ========== BUILD STAGE - Building the Docker image ==========
+            - echo Build started on `date`
+            - docker login -u get2gether --password get2gether # Insecure, but there's nothing of interest in this account other than being a workaround to Docker's rate limiting. See: https://jrklein.com/2020/11/04/aws-codebuild-failed-due-to-docker-pull-rate-limit-solution-update-buildspec-yml-file/
+            - docker build -t $CLIENT_RESPOSITORY_URI:latest .
+            - docker build -t $BACKEND_RESPOSITORY_URI:latest .
+            - docker tag $CLIENT_RESPOSITORY_URI:latest $CLIENT_RESPOSITORY_URI:$IMAGE_TAG
+            - docker tag $BACKEND_RESPOSITORY_URI:latest $BACKEND_RESPOSITORY_URI:$IMAGE_TAG
+    post_build: # Push the Docker image we built to the ECR repo. Writes `imagedefinitions.json` which is used to create a new revision of the service's task definition
+        commands:
+            - echo ========== POST BUILD STAGE - Pushing Built Image to ECR ==========
+            - echo Build completed on `date`
+            - docker push $CLIENT_RESPOSITORY_URI:latest
+            - docker push $CLIENT_RESPOSITORY_URI:$IMAGE_TAG
+            - docker push $BACKEND_RESPOSITORY_URI:latest
+            - docker push $BACKEND_RESPOSITORY_URI:$IMAGE_TAG
+            - echo Writing image definitions file...
+            - printf '[{"name":"get2gether-web-client","imageUri":"%s"},{"name":"get2gether-backend","imageUri":"%s"}]' $CLIENT_RESPOSITORY_URI:$IMAGE_TAG $BACKEND_RESPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+            - cat imagedefinitions.json
+            - echo ========== CodeBuild completed, deployment should kick off after ==========
+artifacts:
+    files: imagedefinitions.json
